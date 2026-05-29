@@ -7,6 +7,8 @@ An interactive AI-powered quiz web app with mock tests, custom questions, score 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Smart Quiz Hub</title>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
 
 *{
@@ -76,7 +78,8 @@ transform:scale(1.02);
 .quiz-box,
 .result,
 .flashcards,
-.admin-panel{
+.admin-panel,
+.analytics{
 display:none;
 }
 
@@ -174,8 +177,18 @@ background:red;
 color:white;
 }
 
+canvas{
+background:white;
+border-radius:15px;
+margin-top:20px;
+width:100%;
+max-height:400px;
+padding:10px;
+}
+
 </style>
 </head>
+
 <body>
 
 <div class="container">
@@ -230,6 +243,10 @@ Computer
 
 <button onclick="openFlashcards()" style="background:#facc15;">
 📘 Flash Cards
+</button>
+
+<button onclick="openAnalytics()" style="background:#8b5cf6;">
+📊 Performance Analytics
 </button>
 
 <button onclick="openAdmin()" style="background:#22c55e;">
@@ -310,6 +327,25 @@ Save Question
 
 </div>
 
+<!-- ANALYTICS -->
+
+<div class="analytics" id="analytics">
+
+<h2>📊 Smart Performance Analytics</h2>
+
+<h3 id="totalQuiz"></h3>
+<h3 id="highestScore"></h3>
+<h3 id="weeklyProgress"></h3>
+<h3 id="monthlyProgress"></h3>
+
+<canvas id="performanceChart"></canvas>
+
+<button onclick="goHomeFromAnalytics()">
+⬅ Back
+</button>
+
+</div>
+
 <!-- FLASHCARDS -->
 
 <div class="flashcards" id="flashcards">
@@ -344,17 +380,13 @@ let user=document.getElementById("signupUser").value.trim();
 let pass=document.getElementById("signupPass").value.trim();
 
 if(user==="" || pass===""){
-
 alert("Fill all fields");
 return;
-
 }
 
 if(localStorage.getItem(user)){
-
 alert("Username already exists");
 return;
-
 }
 
 localStorage.setItem(user,pass);
@@ -369,19 +401,15 @@ let user=document.getElementById("loginUser").value.trim();
 let pass=document.getElementById("loginPass").value.trim();
 
 if(user==="" || pass===""){
-
 alert("Please fill all fields");
 return;
-
 }
 
 let storedPass=localStorage.getItem(user);
 
 if(storedPass===null){
-
 alert("User not found");
 return;
-
 }
 
 if(pass===storedPass){
@@ -401,7 +429,6 @@ alert("Wrong Password");
 function logout(){
 
 localStorage.removeItem("currentUser");
-
 location.reload();
 
 }
@@ -429,27 +456,13 @@ let quizData={
 math:[
 {question:"5 + 7 = ?",options:["10","12","14","15"],answer:"12"},
 {question:"Square root of 81 ?",options:["7","8","9","10"],answer:"9"},
-{question:"10 × 5 = ?",options:["45","50","55","60"],answer:"50"},
-{question:"15 - 8 = ?",options:["5","6","7","8"],answer:"7"},
-{question:"100 ÷ 4 = ?",options:["20","25","30","35"],answer:"25"},
-{question:"Value of π ?",options:["3.14","2.14","4.14","5.14"],answer:"3.14"},
-{question:"9² = ?",options:["18","27","81","72"],answer:"81"},
-{question:"Cube of 3 ?",options:["6","9","27","81"],answer:"27"},
-{question:"Area of square formula ?",options:["a²","2a","4a","a³"],answer:"a²"},
-{question:"Perimeter of rectangle ?",options:["2(l+b)","l+b","l×b","b²"],answer:"2(l+b)"}
+{question:"10 × 5 = ?",options:["45","50","55","60"],answer:"50"}
 ],
 
 science:[
 {question:"Water Formula ?",options:["H2O","CO2","NaCl","O2"],answer:"H2O"},
-{question:"Chemical symbol of Oxygen ?",options:["O","Ox","Og","Oo"],answer:"O"},
 {question:"Red Planet ?",options:["Earth","Mars","Venus","Jupiter"],answer:"Mars"},
-{question:"Sun is a ?",options:["Planet","Star","Asteroid","Satellite"],answer:"Star"},
-{question:"Largest organ in human body ?",options:["Heart","Skin","Liver","Lungs"],answer:"Skin"},
-{question:"Force SI unit ?",options:["Newton","Volt","Joule","Watt"],answer:"Newton"},
-{question:"Boiling point of water ?",options:["50°C","90°C","100°C","120°C"],answer:"100°C"},
-{question:"Plants use during photosynthesis ?",options:["Oxygen","Nitrogen","CO2","Hydrogen"],answer:"CO2"},
-{question:"How many chambers in heart ?",options:["2","3","4","5"],answer:"4"},
-{question:"Earth natural satellite ?",options:["Moon","Sun","Mars","Venus"],answer:"Moon"}
+{question:"Sun is a ?",options:["Planet","Star","Asteroid","Satellite"],answer:"Star"}
 ],
 
 computer:[
@@ -469,51 +482,6 @@ options:["Styling","Database","Programming","Hardware"],
 answer:"Styling"
 },
 {
-question:"JavaScript used for ?",
-options:["Animation","Interactivity","Storage","Hardware"],
-answer:"Interactivity"
-},
-{
-question:"Brain of computer ?",
-options:["CPU","RAM","Mouse","Keyboard"],
-answer:"CPU"
-},
-{
-question:"Full form of CPU ?",
-options:[
-"Central Processing Unit",
-"Central Print Unit",
-"Computer Processing Unit",
-"Control Process Unit"
-],
-answer:"Central Processing Unit"
-},
-{
-question:"Input device ?",
-options:["Monitor","Keyboard","Speaker","Printer"],
-answer:"Keyboard"
-},
-{
-question:"WWW stands for ?",
-options:[
-"World Wide Web",
-"Wide Web World",
-"World Web Window",
-"Web World Wide"
-],
-answer:"World Wide Web"
-},
-{
-question:"Shortcut key for copy ?",
-options:["Ctrl+C","Ctrl+V","Ctrl+X","Ctrl+Z"],
-answer:"Ctrl+C"
-},
-{
-question:"Binary digits are ?",
-options:["0 and 1","1 and 2","A and B","Yes and No"],
-answer:"0 and 1"
-},
-{
 question:"Which language runs in browser ?",
 options:["Java","Python","JavaScript","C"],
 answer:"JavaScript"
@@ -525,12 +493,10 @@ answer:"JavaScript"
 /* LOAD SAVED QUESTIONS */
 
 if(localStorage.getItem("customQuiz")){
-
 quizData=JSON.parse(localStorage.getItem("customQuiz"));
-
 }
 
-/* ADD QUESTION */
+/* ADMIN */
 
 function openAdmin(){
 
@@ -558,7 +524,8 @@ option1==="" ||
 option2==="" ||
 option3==="" ||
 option4==="" ||
-answer===""){
+answer===""
+){
 
 alert("Fill all fields");
 return;
@@ -581,8 +548,6 @@ JSON.stringify(quizData)
 );
 
 alert("Question Added Successfully");
-
-/* CLEAR INPUTS */
 
 document.getElementById("newQuestion").value="";
 document.getElementById("option1").value="";
@@ -608,13 +573,11 @@ function startQuiz(subject){
 document.getElementById("home").style.display="none";
 document.getElementById("quizBox").style.display="block";
 
-/* RANDOM 10 QUESTIONS */
-
 let allQuestions=[...quizData[subject]];
 
 allQuestions.sort(()=>Math.random()-0.5);
 
-currentQuiz=allQuestions.slice(0,10);
+currentQuiz=allQuestions;
 
 currentQuestion=0;
 score=0;
@@ -668,10 +631,8 @@ button.classList.add("selected");
 function nextQuestion(){
 
 if(selectedAnswer===""){
-
 alert("Select Answer");
 return;
-
 }
 
 answers.push({
@@ -712,10 +673,29 @@ document.getElementById("result").style.display="block";
 
 let percent=(score/currentQuiz.length)*100;
 
+/* SAVE PERFORMANCE */
+
+let performanceData=
+JSON.parse(localStorage.getItem("performanceData")) || [];
+
+performanceData.push({
+
+date:new Date().toLocaleDateString(),
+score:score,
+total:currentQuiz.length,
+percentage:percent
+
+});
+
+localStorage.setItem(
+"performanceData",
+JSON.stringify(performanceData)
+);
+
 document.getElementById("finalScore").innerHTML=
 `
 Your Score: ${score}/${currentQuiz.length}<br>
-Percentage: ${percent}%
+Percentage: ${percent.toFixed(1)}%
 `;
 
 let reviewHTML="<ul>";
@@ -791,31 +771,141 @@ document.getElementById("home").style.display="block";
 
 }
 
-/* FLASH CARDS */
+/* ANALYTICS */
+
+let chartInstance=null;
+
+function openAnalytics(){
+
+document.getElementById("home").style.display="none";
+document.getElementById("analytics").style.display="block";
+
+let performanceData=
+JSON.parse(localStorage.getItem("performanceData")) || [];
+
+if(performanceData.length===0){
+
+document.getElementById("totalQuiz").innerHTML=
+"No Quiz Attempted Yet";
+
+document.getElementById("highestScore").innerHTML="";
+document.getElementById("weeklyProgress").innerHTML="";
+document.getElementById("monthlyProgress").innerHTML="";
+
+return;
+
+}
+
+document.getElementById("totalQuiz").innerHTML=
+"Total Quizzes Attempted: "+
+performanceData.length;
+
+let highest=Math.max(
+...performanceData.map(data=>data.percentage)
+);
+
+document.getElementById("highestScore").innerHTML=
+"Highest Percentage: "+
+highest.toFixed(1)+"%";
+
+let weekly=performanceData.slice(-7);
+
+let weeklyAvg=
+weekly.reduce((sum,item)=>sum+item.percentage,0)
+/ weekly.length;
+
+document.getElementById("weeklyProgress").innerHTML=
+"Weekly Average: "+
+weeklyAvg.toFixed(1)+"%";
+
+let monthly=performanceData.slice(-30);
+
+let monthlyAvg=
+monthly.reduce((sum,item)=>sum+item.percentage,0)
+/ monthly.length;
+
+document.getElementById("monthlyProgress").innerHTML=
+"Monthly Average: "+
+monthlyAvg.toFixed(1)+"%";
+
+let labels=
+performanceData.map((data,index)=>
+"Quiz "+(index+1)
+);
+
+let scores=
+performanceData.map(data=>data.percentage);
+
+let ctx=document.getElementById("performanceChart");
+
+if(chartInstance){
+chartInstance.destroy();
+}
+
+chartInstance=new Chart(ctx,{
+
+type:"line",
+
+data:{
+
+labels:labels,
+
+datasets:[{
+
+label:"Performance %",
+data:scores,
+borderWidth:3,
+tension:0.3
+
+}]
+
+},
+
+options:{
+
+responsive:true,
+
+scales:{
+
+y:{
+beginAtZero:true,
+max:100
+}
+
+}
+
+}
+
+});
+
+}
+
+function goHomeFromAnalytics(){
+
+document.getElementById("analytics").style.display="none";
+document.getElementById("home").style.display="block";
+
+}
+
+/* FLASHCARDS */
 
 const flashData={
 
 math:[
 {q:"5+7",a:"12"},
 {q:"Square root of 81",a:"9"},
-{q:"10×5",a:"50"},
-{q:"Area of square",a:"a²"},
-{q:"Cube of 3",a:"27"}
+{q:"10×5",a:"50"}
 ],
 
 science:[
 {q:"Water Formula",a:"H2O"},
 {q:"Red Planet",a:"Mars"},
-{q:"Largest organ",a:"Skin"},
-{q:"Force SI Unit",a:"Newton"},
 {q:"Sun is a",a:"Star"}
 ],
 
 computer:[
 {q:"Brain of Computer",a:"CPU"},
-{q:"HTML stands for",a:"Hyper Text Markup Language"},
 {q:"Shortcut for Copy",a:"Ctrl+C"},
-{q:"WWW stands for",a:"World Wide Web"},
 {q:"Browser language",a:"JavaScript"}
 ]
 
@@ -885,4 +975,4 @@ document.getElementById("home").style.display="block";
 </script>
 
 </body>
-</html>
+</html> 
