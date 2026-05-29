@@ -1,5 +1,6 @@
 # ai-smart-quiz-hub
 An interactive AI-powered quiz web app with mock tests, custom questions, score tracking, and responsive UI built using HTML, CSS, and JavaScript.
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -451,6 +452,8 @@ showHome();
 
 /* QUIZ DATA */
 
+let quizData={
+
 math:[
 {question:"5 + 7 = ?",options:["10","12","14","15"],answer:"12"},
 {question:"Square root of 81 ?",options:["7","8","9","10"],answer:"9"},
@@ -545,7 +548,78 @@ answer:"JavaScript"
 }
 ]
 
-  /*QUiz*/
+};
+
+/* LOAD SAVED QUESTIONS */
+
+if(localStorage.getItem("customQuiz")){
+quizData=JSON.parse(localStorage.getItem("customQuiz"));
+}
+
+/* ADMIN */
+
+function openAdmin(){
+
+document.getElementById("home").style.display="none";
+document.getElementById("adminPanel").style.display="block";
+
+}
+
+function addQuestion(){
+
+let subject=document.getElementById("subjectSelect").value;
+
+let question=document.getElementById("newQuestion").value;
+
+let option1=document.getElementById("option1").value;
+let option2=document.getElementById("option2").value;
+let option3=document.getElementById("option3").value;
+let option4=document.getElementById("option4").value;
+
+let answer=document.getElementById("correctAnswer").value;
+
+if(
+question==="" ||
+option1==="" ||
+option2==="" ||
+option3==="" ||
+option4==="" ||
+answer===""
+){
+
+alert("Fill all fields");
+return;
+
+}
+
+let newQ={
+
+question:question,
+options:[option1,option2,option3,option4],
+answer:answer
+
+};
+
+quizData[subject].push(newQ);
+
+localStorage.setItem(
+"customQuiz",
+JSON.stringify(quizData)
+);
+
+alert("Question Added Successfully");
+
+document.getElementById("newQuestion").value="";
+document.getElementById("option1").value="";
+document.getElementById("option2").value="";
+document.getElementById("option3").value="";
+document.getElementById("option4").value="";
+document.getElementById("correctAnswer").value="";
+
+}
+
+/* QUIZ */
+
 let currentQuiz=[];
 let currentQuestion=0;
 let score=0;
@@ -873,6 +947,7 @@ document.getElementById("home").style.display="block";
 
 }
 
+
 /* FLASHCARDS */
 
 const flashData={
@@ -982,4 +1057,4 @@ document.getElementById("home").style.display="block";
 </script>
 
 </body>
-</html> 
+</html>
