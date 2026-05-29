@@ -451,18 +451,30 @@ showHome();
 
 /* QUIZ DATA */
 
-let quizData={
-
 math:[
 {question:"5 + 7 = ?",options:["10","12","14","15"],answer:"12"},
 {question:"Square root of 81 ?",options:["7","8","9","10"],answer:"9"},
-{question:"10 × 5 = ?",options:["45","50","55","60"],answer:"50"}
+{question:"10 × 5 = ?",options:["45","50","55","60"],answer:"50"},
+{question:"15 - 8 = ?",options:["5","6","7","8"],answer:"7"},
+{question:"100 ÷ 4 = ?",options:["20","25","30","35"],answer:"25"},
+{question:"Value of π ?",options:["3.14","2.14","4.14","5.14"],answer:"3.14"},
+{question:"9² = ?",options:["18","27","81","72"],answer:"81"},
+{question:"Cube of 3 ?",options:["6","9","27","81"],answer:"27"},
+{question:"Area of square formula ?",options:["a²","2a","4a","a³"],answer:"a²"},
+{question:"Perimeter of rectangle ?",options:["2(l+b)","l+b","l×b","b²"],answer:"2(l+b)"}
 ],
 
 science:[
 {question:"Water Formula ?",options:["H2O","CO2","NaCl","O2"],answer:"H2O"},
+{question:"Chemical symbol of Oxygen ?",options:["O","Ox","Og","Oo"],answer:"O"},
 {question:"Red Planet ?",options:["Earth","Mars","Venus","Jupiter"],answer:"Mars"},
-{question:"Sun is a ?",options:["Planet","Star","Asteroid","Satellite"],answer:"Star"}
+{question:"Sun is a ?",options:["Planet","Star","Asteroid","Satellite"],answer:"Star"},
+{question:"Largest organ in human body ?",options:["Heart","Skin","Liver","Lungs"],answer:"Skin"},
+{question:"Force SI unit ?",options:["Newton","Volt","Joule","Watt"],answer:"Newton"},
+{question:"Boiling point of water ?",options:["50°C","90°C","100°C","120°C"],answer:"100°C"},
+{question:"Plants use during photosynthesis ?",options:["Oxygen","Nitrogen","CO2","Hydrogen"],answer:"CO2"},
+{question:"How many chambers in heart ?",options:["2","3","4","5"],answer:"4"},
+{question:"Earth natural satellite ?",options:["Moon","Sun","Mars","Venus"],answer:"Moon"}
 ],
 
 computer:[
@@ -482,84 +494,58 @@ options:["Styling","Database","Programming","Hardware"],
 answer:"Styling"
 },
 {
+question:"JavaScript used for ?",
+options:["Animation","Interactivity","Storage","Hardware"],
+answer:"Interactivity"
+},
+{
+question:"Brain of computer ?",
+options:["CPU","RAM","Mouse","Keyboard"],
+answer:"CPU"
+},
+{
+question:"Full form of CPU ?",
+options:[
+"Central Processing Unit",
+"Central Print Unit",
+"Computer Processing Unit",
+"Control Process Unit"
+],
+answer:"Central Processing Unit"
+},
+{
+question:"Input device ?",
+options:["Monitor","Keyboard","Speaker","Printer"],
+answer:"Keyboard"
+},
+{
+question:"WWW stands for ?",
+options:[
+"World Wide Web",
+"Wide Web World",
+"World Web Window",
+"Web World Wide"
+],
+answer:"World Wide Web"
+},
+{
+question:"Shortcut key for copy ?",
+options:["Ctrl+C","Ctrl+V","Ctrl+X","Ctrl+Z"],
+answer:"Ctrl+C"
+},
+{
+question:"Binary digits are ?",
+options:["0 and 1","1 and 2","A and B","Yes and No"],
+answer:"0 and 1"
+},
+{
 question:"Which language runs in browser ?",
 options:["Java","Python","JavaScript","C"],
 answer:"JavaScript"
 }
 ]
 
-};
-
-/* LOAD SAVED QUESTIONS */
-
-if(localStorage.getItem("customQuiz")){
-quizData=JSON.parse(localStorage.getItem("customQuiz"));
-}
-
-/* ADMIN */
-
-function openAdmin(){
-
-document.getElementById("home").style.display="none";
-document.getElementById("adminPanel").style.display="block";
-
-}
-
-function addQuestion(){
-
-let subject=document.getElementById("subjectSelect").value;
-
-let question=document.getElementById("newQuestion").value;
-
-let option1=document.getElementById("option1").value;
-let option2=document.getElementById("option2").value;
-let option3=document.getElementById("option3").value;
-let option4=document.getElementById("option4").value;
-
-let answer=document.getElementById("correctAnswer").value;
-
-if(
-question==="" ||
-option1==="" ||
-option2==="" ||
-option3==="" ||
-option4==="" ||
-answer===""
-){
-
-alert("Fill all fields");
-return;
-
-}
-
-let newQ={
-
-question:question,
-options:[option1,option2,option3,option4],
-answer:answer
-
-};
-
-quizData[subject].push(newQ);
-
-localStorage.setItem(
-"customQuiz",
-JSON.stringify(quizData)
-);
-
-alert("Question Added Successfully");
-
-document.getElementById("newQuestion").value="";
-document.getElementById("option1").value="";
-document.getElementById("option2").value="";
-document.getElementById("option3").value="";
-document.getElementById("option4").value="";
-document.getElementById("correctAnswer").value="";
-
-}
-
-/* QUIZ */
-
+  /*QUiz*/
 let currentQuiz=[];
 let currentQuestion=0;
 let score=0;
@@ -894,18 +880,39 @@ const flashData={
 math:[
 {q:"5+7",a:"12"},
 {q:"Square root of 81",a:"9"},
-{q:"10×5",a:"50"}
+{q:"10×5",a:"50"},
+{q:"15-8",a:"7"},
+{q:"100÷4",a:"25"},
+{q:"Value of π",a:"3.14"},
+{q:"9²",a:"81"},
+{q:"Cube of 3",a:"27"},
+{q:"Area of square",a:"a²"},
+{q:"Perimeter rectangle",a:"2(l+b)"}
 ],
 
 science:[
 {q:"Water Formula",a:"H2O"},
+{q:"Symbol of Oxygen",a:"O"},
 {q:"Red Planet",a:"Mars"},
-{q:"Sun is a",a:"Star"}
+{q:"Sun is a",a:"Star"},
+{q:"Largest organ",a:"Skin"},
+{q:"Force SI Unit",a:"Newton"},
+{q:"Boiling point water",a:"100°C"},
+{q:"Photosynthesis gas",a:"CO2"},
+{q:"Heart chambers",a:"4"},
+{q:"Earth satellite",a:"Moon"}
 ],
 
 computer:[
 {q:"Brain of Computer",a:"CPU"},
+{q:"HTML stands for",a:"Hyper Text Markup Language"},
+{q:"CSS used for",a:"Styling"},
+{q:"JavaScript used for",a:"Interactivity"},
+{q:"Full form of CPU",a:"Central Processing Unit"},
+{q:"Input device",a:"Keyboard"},
+{q:"WWW stands for",a:"World Wide Web"},
 {q:"Shortcut for Copy",a:"Ctrl+C"},
+{q:"Binary digits",a:"0 and 1"},
 {q:"Browser language",a:"JavaScript"}
 ]
 
